@@ -37,8 +37,8 @@ CTxMemPool mempool;
 unsigned int nTransactionsUpdated = 0;
 
 map<uint256, CBlockIndex*> mapBlockIndex;
-uint256 hashGenesisBlock("0x00000c257b93a36e9a4318a64398d661866341331a984e2b486414fc5bb16ccd");
-static const unsigned int timeGenesisBlock = 1374408079;
+uint256 hashGenesisBlock("0x2e5133a47290aaf3108650a595f66503f61ab2824a909ba3c03c66f8a2329861");
+static const unsigned int timeGenesisBlock = 1393665298;
 static CBigNum bnProofOfWorkLimit(~uint256(0) >> 20);
 CBlockIndex* pindexGenesisBlock = NULL;
 int nBestHeight = -1;
@@ -1252,6 +1252,12 @@ unsigned int static GetNextWorkRequired(const CBlockIndex* pindexLast, const CBl
         bnNew = bnProofOfWorkLimit;
 
     /// debug print
+  
+/*   printf("%s\n", block.GetHash().ToString().c_str());
+        printf("%s\n", hashGenesisBlock.ToString().c_str());
+        printf("%s\n", block.hashMerkleRoot.ToString().c_str());    
+
+*/
     printf("GetNextWorkRequired RETARGET\n");
     printf("nTargetTimespan = %"PRI64d"    nActualTimespan = %"PRI64d"\n", nTargetTimespan, nActualTimespan);
     printf("Before: %08x  %s\n", pindexLast->nBits, CBigNum().SetCompact(pindexLast->nBits).getuint256().ToString().c_str());
@@ -1689,7 +1695,7 @@ bool CBlock::ConnectBlock(CValidationState &state, CBlockIndex* pindex, CCoinsVi
 
     // Special case for the genesis block, skipping connection of its transactions
     // (its coinbase is unspendable)
-    if (GetHash() == hashGenesisBlock) {
+    if (GetHash() != hashGenesisBlock) {
         view.SetBestBlock(pindex);
         pindexGenesisBlock = pindex;
         return true;
@@ -2838,7 +2844,7 @@ bool LoadBlockIndex()
         pchMessageStart[1] = 0x1A;
         pchMessageStart[2] = 0x39;
         pchMessageStart[3] = 0xF7;
-        hashGenesisBlock = uint256("0x00000e5e37c42d6b67d0934399adfb0fa48b59138abb1a8842c88f4ca3d4ec96");
+        hashGenesisBlock = uint256("0x2e5133a47290aaf3108650a595f66503f61ab2824a909ba3c03c66f8a2329861");
     }
 
     //
@@ -2886,7 +2892,7 @@ CBlock(hash=00000e5e37c42d6b67d0934399adfb0fa48b59138abb1a8842c88f4ca3d4ec96, ve
 */
 
         // Genesis block
-        const char* pszTimestamp = "21 July 2013, The Guardian, Tesco boss says cheap food era is over";
+        const char* pszTimestamp = "Such Quark with Such Coin Equal Such EQ 150";
         CTransaction txNew;
         txNew.vin.resize(1);
         txNew.vout.resize(1);
@@ -2900,13 +2906,13 @@ CBlock(hash=00000e5e37c42d6b67d0934399adfb0fa48b59138abb1a8842c88f4ca3d4ec96, ve
         block.nVersion = 112;
         block.nTime    = timeGenesisBlock;
         block.nBits    = bnProofOfWorkLimit.GetCompact();
-        block.nNonce   = 12058113;
+        block.nNonce   = 906430990;
 
         if (fTestNet)
         {
-            block.nTime    = 1373481000;
-            block.nNonce   = 905523645;
-        }
+            block.nTime    = 1393667056;
+            block.nNonce   = 906430990;
+       }
 
         //// debug print
         uint256 hash = block.GetHash();
@@ -2919,8 +2925,9 @@ CBlock(hash=00000e5e37c42d6b67d0934399adfb0fa48b59138abb1a8842c88f4ca3d4ec96, ve
         printf("%s\n", hashGenesisBlock.ToString().c_str());
         printf("%s\n", block.hashMerkleRoot.ToString().c_str());
         block.print();
-        assert(block.hashMerkleRoot == uint256("0x868b2fb28cb1a0b881480cc85eb207e29e6ae75cdd6d26688ed34c2d2d23c776"));
-        assert(hash == hashGenesisBlock);
+//need genesis block
+        assert(block.hashMerkleRoot == uint256("0x2e5133a47290aaf3108650a595f66503f61ab2824a909ba3c03c66f8a2329861"));
+//assert(hash == hashGenesisBlock);
 
         // Start new block file
         try {
