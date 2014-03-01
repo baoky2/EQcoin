@@ -1,10 +1,4 @@
 build_config.mk
-*.a
-*.o
-*.dylib*
-*.so
-*.so.*
-*_test
 db_bench
 Release
 Debug
