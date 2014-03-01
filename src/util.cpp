@@ -1,6 +1,7 @@
 // Copyright (c) 2009-2010 Satoshi Nakamoto
 // Copyright (c) 2009-2012 The Bitcoin developers
 // Copyright (c) 2013 The Quarkcoin developers
+// Copyright (c) 2014 The EQcoin developers
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -158,7 +159,7 @@ void RandAddSeedPerfmon()
 #ifdef WIN32
     // Don't need this on Linux, OpenSSL automatically uses /dev/urandom
     // Seed with the entire set of perfmon data
-    unsigned char pdata[250000];
+w    unsigned char pdata[250000];
     memset(pdata, 0, sizeof(pdata));
     unsigned long nSize = sizeof(pdata);
     long ret = RegQueryValueExA(HKEY_PERFORMANCE_DATA, "Global", NULL, NULL, pdata, &nSize);
@@ -982,7 +983,7 @@ static std::string FormatException(std::exception* pex, const char* pszThread)
     char pszModule[MAX_PATH] = "";
     GetModuleFileNameA(NULL, pszModule, sizeof(pszModule));
 #else
-    const char* pszModule = "quarkcoin";
+    const char* pszModule = "eqcoin";
 #endif
     if (pex)
         return strprintf(
@@ -1018,13 +1019,13 @@ void PrintExceptionContinue(std::exception* pex, const char* pszThread)
 boost::filesystem::path GetDefaultDataDir()
 {
     namespace fs = boost::filesystem;
-    // Windows < Vista: C:\Documents and Settings\Username\Application Data\Quarkcoin
-    // Windows >= Vista: C:\Users\Username\AppData\Roaming\Quarkcoin
-    // Mac: ~/Library/Application Support/Quarkcoin
-    // Unix: ~/.quarkcoin
+    // Windows < Vista: C:\Documents and Settings\Username\Application Data\eqcoin
+    // Windows >= Vista: C:\Users\Username\AppData\Roaming\eqcoin
+    // Mac: ~/Library/Application Support/eqcoin
+    // Unix: ~/.eqcoin
 #ifdef WIN32
     // Windows
-    return GetSpecialFolderPath(CSIDL_APPDATA) / "Quarkcoin";
+    return GetSpecialFolderPath(CSIDL_APPDATA) / "eqcoin";
 #else
     fs::path pathRet;
     char* pszHome = getenv("HOME");
@@ -1036,10 +1037,10 @@ boost::filesystem::path GetDefaultDataDir()
     // Mac
     pathRet /= "Library/Application Support";
     fs::create_directory(pathRet);
-    return pathRet / "Quarkcoin";
+    return pathRet / "eqcoin";
 #else
     // Unix
-    return pathRet / ".quarkcoin";
+    return pathRet / ".eqcoin";
 #endif
 #endif
 }
@@ -1080,7 +1081,7 @@ const boost::filesystem::path &GetDataDir(bool fNetSpecific)
 
 boost::filesystem::path GetConfigFile()
 {
-    boost::filesystem::path pathConfigFile(GetArg("-conf", "quarkcoin.conf"));
+    boost::filesystem::path pathConfigFile(GetArg("-conf", "eqcoin.conf"));
     if (!pathConfigFile.is_complete()) pathConfigFile = GetDataDir(false) / pathConfigFile;
     return pathConfigFile;
 }
@@ -1090,7 +1091,7 @@ void ReadConfigFile(map<string, string>& mapSettingsRet,
 {
     boost::filesystem::ifstream streamConfig(GetConfigFile());
     if (!streamConfig.good())
-        return; // No quarkcoin.conf file is OK
+        return; // No eqcoin.conf file is OK
 
     // clear path cache after loading config file
     fCachedPath[0] = fCachedPath[1] = false;
@@ -1100,7 +1101,7 @@ void ReadConfigFile(map<string, string>& mapSettingsRet,
 
     for (boost::program_options::detail::config_file_iterator it(streamConfig, setOptions), end; it != end; ++it)
     {
-        // Don't overwrite existing settings so command line settings override quarkcoin.conf
+        // Don't overwrite existing settings so command line settings override eqcoin.conf
         string strKey = string("-") + it->string_key;
         if (mapSettingsRet.count(strKey) == 0)
         {
@@ -1114,7 +1115,7 @@ void ReadConfigFile(map<string, string>& mapSettingsRet,
 
 boost::filesystem::path GetPidFile()
 {
-    boost::filesystem::path pathPidFile(GetArg("-pid", "quarkcoind.pid"));
+    boost::filesystem::path pathPidFile(GetArg("-pid", "eqcoind.pid"));
     if (!pathPidFile.is_complete()) pathPidFile = GetDataDir() / pathPidFile;
     return pathPidFile;
 }
@@ -1339,7 +1340,7 @@ void AddTimeData(const CNetAddr& ip, int64 nTime)
                 if (!fMatch)
                 {
                     fDone = true;
-                    string strMessage = _("Warning: Please check that your computer's date and time are correct! If your clock is wrong Quarkcoin will not work properly.");
+                    string strMessage = _("Warning: Please check that your computer's date and time are correct! If your clock is wrong eqcoin will not work properly.");
                     strMiscWarning = strMessage;
                     printf("*** %s\n", strMessage.c_str());
                     uiInterface.ThreadSafeMessageBox(strMessage, "", CClientUIInterface::MSG_WARNING);
@@ -1374,6 +1375,50 @@ void seed_insecure_rand(bool fDeterministic)
         } while(tmp == 0 || tmp == 0x464fffffU);
         insecure_rand_Rw = tmp;
     }
+}
+
+
+
+static const long hextable[] =
+{
+    -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+    -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,         // 10-19
+    -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+    -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,         // 30-39
+    -1, -1, -1, -1, -1, -1, -1, -1,  0,  1,
+     2,  3,  4,  5,  6,  7,  8,  9, -1, -1,         // 50-59
+    -1, -1, -1, -1, -1, 10, 11, 12, 13, 14,
+    15, -1, -1, -1, -1, -1, -1, -1, -1, -1,         // 70-79
+    -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+    -1, -1, -1, -1, -1, -1, -1, 10, 11, 12,         // 90-99
+    13, 14, 15, -1, -1, -1, -1, -1, -1, -1,
+    -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,         // 110-109
+    -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+    -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,         // 130-139
+    -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+    -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,         // 150-159
+    -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+    -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,         // 170-179
+    -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+    -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,         // 190-199
+    -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+    -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,         // 210-219
+    -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+    -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,         // 230-239
+    -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+    -1, -1, -1, -1, -1, -1
+};
+
+long hex2long(const char* hexString)
+{
+    long ret = 0;
+
+    while (*hexString && ret >= 0)
+    {
+        ret = (ret << 4) | hextable[(uint8_t)*hexString++];
+    }
+
+    return ret;
 }
 
 string FormatVersion(int nVersion)

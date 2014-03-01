@@ -2,6 +2,7 @@
 // Copyright (c) 2009-2013 The Bitcoin developers
 // Copyright (c) 2013 The Sifcoin developers
 // Copyright (c) 2013 The Quarkcoin developers
+// Copyright (c) 2014 The EQcoin developers
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -17,6 +18,8 @@
 #include <boost/algorithm/string/replace.hpp>
 #include <boost/filesystem.hpp>
 #include <boost/filesystem/fstream.hpp>
+#include <boost/random/mersenne_twister.hpp>
+#include <boost/random/uniform_int.hpp>
 
 using namespace std;
 using namespace boost;
@@ -42,6 +45,7 @@ int nBestHeight = -1;
 uint256 nBestChainWork = 0;
 uint256 nBestInvalidWork = 0;
 uint256 hashBestChain = 0;
+uint256 prevHash = 0;
 CBlockIndex* pindexBest = NULL;
 set<CBlockIndex*, CBlockIndexWorkComparator> setBlockIndexValid; // may contain all CBlockIndex*'s that have validness >=BLOCK_VALID_TRANSACTIONS, and must contain those who aren't failed
 int64 nTimeBestReceived = 0;
@@ -68,7 +72,7 @@ map<uint256, map<uint256, CDataStream*> > mapOrphanTransactionsByPrev;
 // Constant stuff for coinbase transactions we create:
 CScript COINBASE_FLAGS;
 
-const string strMessageMagic = "Quarkcoin Signed Message:\n";
+const string strMessageMagic = "EQcoin Signed Message:\n";
 
 double dHashesPerSec = 0.0;
 int64 nHPSTimerStart = 0;
@@ -159,11 +163,6 @@ void static ResendWalletTransactions()
     BOOST_FOREACH(CWallet* pwallet, setpwalletRegistered)
         pwallet->ResendWalletTransactions();
 }
-
-
-
-
-
 
 
 //////////////////////////////////////////////////////////////////////////////
@@ -1100,9 +1099,17 @@ static const int64 nTargetTimespan = 4 * 60 * 60; // EQ coin every 4 hrs
 static const int64 nTargetSpacing = 60; //  1 minute
 static const int64 nInterval = nTargetTimespan / nTargetSpacing; // 20 blocks
 
-int64 static GetBlockValue(int nHeight, int64 nFees, unsigned int nBits)
+int static generateMTRandom(unsigned int s, int range)
 {
-     int64 nSubsidy = 10000 * COIN;
+    boost::mt19937 gen(s);
+    boost::uniform_int<> dist(1, range);
+    return dist(gen);
+}
+
+
+int64 static GetBlockValue(int nHeight, int64 nFees, unsigned int nBits, uint256 prevHash)
+{
+ int64 nSubsidy = 10000 * COIN;
 
     std::string cseed_str = prevHash.ToString().substr(7,7);
     const char* cseed = cseed_str.c_str();
@@ -1158,6 +1165,7 @@ int64 static GetBlockValue(int nHeight, int64 nFees, unsigned int nBits)
         rand5 = generateMTRandom(seed, 31249);
         nSubsidy = (1 + rand5) * COIN;
     }
+
 
     return nSubsidy + nFees;
 }
@@ -1775,8 +1783,14 @@ bool CBlock::ConnectBlock(CValidationState &state, CBlockIndex* pindex, CCoinsVi
     if (fBenchmark)
         printf("- Connect %u transactions: %.2fms (%.3fms/tx, %.3fms/txin)\n", (unsigned)vtx.size(), 0.001 * nTime, 0.001 * nTime / vtx.size(), nInputs <= 1 ? 0 : 0.001 * nTime / (nInputs-1));
 
-    if (vtx[0].GetValueOut() > GetBlockValue(pindex->nHeight, nFees, pindex->nBits))
-        return state.DoS(100, error("ConnectBlock() : coinbase pays too much (actual=%"PRI64d" vs limit=%"PRI64d")", vtx[0].GetValueOut(), GetBlockValue(pindex->nHeight, nFees, pindex->nBits)));
+    prevHash = 0;
+    if(pindex->pprev)
+    {
+        prevHash = pindex->pprev->GetBlockHash();
+    }
+
+    if (vtx[0].GetValueOut() > GetBlockValue(pindex->nHeight, nFees, pindex->nBits, prevHash))
+        return state.DoS(100, error("ConnectBlock() : coinbase pays too much (actual=%"PRI64d" vs limit=%"PRI64d")", vtx[0].GetValueOut(), GetBlockValue(pindex->nHeight, nFees, pindex->nBits, prevHash)));
 
     if (!control.Wait())
         return state.DoS(100, false);
@@ -1786,6 +1800,7 @@ bool CBlock::ConnectBlock(CValidationState &state, CBlockIndex* pindex, CCoinsVi
 
     if (fJustCheck)
         return true;
+
 
     // Write undo information to disk
     if (pindex->GetUndoPos().IsNull() || (pindex->nStatus & BLOCK_VALID_MASK) < BLOCK_VALID_SCRIPTS)
@@ -4576,8 +4591,10 @@ CBlockTemplate* CreateNewBlock(CReserveKey& reservekey)
         pblock->nBits          = GetNextWorkRequired(pindexPrev, pblock);
         pblock->nNonce         = 0;
 
+
+
         // Calculate nVvalue dependet nBits
-        pblock->vtx[0].vout[0].nValue = GetBlockValue(pindexPrev->nHeight+1, nFees, pblock->nBits);
+        pblock->vtx[0].vout[0].nValue = GetBlockValue(pindexPrev->nHeight+1, nFees, pblock->nBits, prevHash);
         pblocktemplate->vTxFees[0] = -nFees;
 
         pblock->vtx[0].vin[0].scriptSig = CScript() << OP_0 << OP_0;
@@ -4669,7 +4686,7 @@ bool CheckWork(CBlock* pblock, CWallet& wallet, CReserveKey& reservekey)
         return false;
 
     //// debug print
-    printf("QuarkcoinMiner:\n");
+    printf("EQcoinMiner:\n");
     printf("proof-of-work found  \n  hash: %s  \ntarget: %s\n", hash.GetHex().c_str(), hashTarget.GetHex().c_str());
     pblock->print();
     printf("generated %s\n", FormatMoney(pblock->vtx[0].vout[0].nValue).c_str());
@@ -4678,7 +4695,7 @@ bool CheckWork(CBlock* pblock, CWallet& wallet, CReserveKey& reservekey)
     {
         LOCK(cs_main);
         if (pblock->hashPrevBlock != hashBestChain)
-            return error("QuarkcoinMiner : generated block is stale");
+            return error("EQcoinMiner : generated block is stale");
 
         // Remove key from key pool
         reservekey.KeepKey();
@@ -4692,7 +4709,7 @@ bool CheckWork(CBlock* pblock, CWallet& wallet, CReserveKey& reservekey)
         // Process this block the same as if we had received it from another node
         CValidationState state;
         if (!ProcessBlock(state, NULL, pblock))
-            return error("QuarkcoinMiner : ProcessBlock, block not accepted");
+            return error("EQcoinMiner : ProcessBlock, block not accepted");
     }
 
     return true;
@@ -4700,9 +4717,9 @@ bool CheckWork(CBlock* pblock, CWallet& wallet, CReserveKey& reservekey)
 
 void static BitcoinMiner(CWallet *pwallet)
 {
-    printf("QuarkcoinMiner started\n");
+    printf("EQcoinMiner started\n");
     SetThreadPriority(THREAD_PRIORITY_LOWEST);
-    RenameThread("quarkcoin-miner");
+    RenameThread("eqcoin-miner");
 
     // Each thread has its own key and counter
     CReserveKey reservekey(pwallet);
@@ -4726,7 +4743,7 @@ void static BitcoinMiner(CWallet *pwallet)
         CBlock *pblock = &pblocktemplate->block;
         IncrementExtraNonce(pblock, pindexPrev, nExtraNonce);
 
-        printf("Running QuarkcoinMiner with %"PRIszu" transactions in block (%u bytes)\n", pblock->vtx.size(),
+        printf("Running EQnoinMiner with %"PRIszu" transactions in block (%u bytes)\n", pblock->vtx.size(),
                ::GetSerializeSize(*pblock, SER_NETWORK, PROTOCOL_VERSION));
 
         //
@@ -4830,7 +4847,7 @@ void static BitcoinMiner(CWallet *pwallet)
     } }
     catch (boost::thread_interrupted)
     {
-        printf("QuarkcoinMiner terminated\n");
+        printf("EQcoinMiner terminated\n");
         throw;
     }
 }
