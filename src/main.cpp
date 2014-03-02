@@ -37,7 +37,7 @@ CTxMemPool mempool;
 unsigned int nTransactionsUpdated = 0;
 
 map<uint256, CBlockIndex*> mapBlockIndex;
-uint256 hashGenesisBlock("0x00000c92ee44bdddf302e9c992fa91a82acde70fb610345e5dfd305111f108ea");
+uint256 hashGenesisBlock("");
 static const unsigned int timeGenesisBlock = 1393665298;
 static CBigNum bnProofOfWorkLimit(~uint256(0) >> 20);
 CBlockIndex* pindexGenesisBlock = NULL;
@@ -217,7 +217,7 @@ std::map<uint256,CCoins>::iterator CCoinsViewCache::FetchCoins(const uint256 &tx
 
 CCoins &CCoinsViewCache::GetCoins(const uint256 &txid) {
     std::map<uint256,CCoins>::iterator it = FetchCoins(txid);
-    assert(it != cacheCoins.end());
+assert(it != cacheCoins.end());
     return it->second;
 }
 
@@ -1858,8 +1858,7 @@ bool SetBestChain(CValidationState &state, CBlockIndex* pindexNew)
     {
         while (plonger->nHeight > pfork->nHeight) {
             plonger = plonger->pprev;
-            
-assert(plonger != NULL);
+            assert(plonger != NULL);
         }
         if (pfork == plonger)
             break;
@@ -2846,7 +2845,7 @@ bool LoadBlockIndex()
         pchMessageStart[1] = 0x1A;
         pchMessageStart[2] = 0x39;
         pchMessageStart[3] = 0xF7;
-        hashGenesisBlock = uint256("0x00000ebb40d7303580442fae35ae138a5ffe70fbafce85eaebc63fffcb8820f1");
+        hashGenesisBlock = uint256("");
     }
 
     //
@@ -2894,7 +2893,7 @@ CBlock(hash=00000e5e37c42d6b67d0934399adfb0fa48b59138abb1a8842c88f4ca3d4ec96, ve
 */
 
         // Genesis block
-        const char* pszTimestamp = "China Crisis Gauge Hits Record as Investors Draw Parallel to 2008";
+        const char* pszTimestamp = "Apple Better Watch Out. Samsung Wastes Little Time in Wheeling Out More Smartwatches";
         CTransaction txNew;
         txNew.vin.resize(1);
         txNew.vout.resize(1);
@@ -2908,12 +2907,12 @@ CBlock(hash=00000e5e37c42d6b67d0934399adfb0fa48b59138abb1a8842c88f4ca3d4ec96, ve
         block.nVersion = 112;
         block.nTime    = timeGenesisBlock;
         block.nBits    = bnProofOfWorkLimit.GetCompact();
-        block.nNonce   = 2126260;
+        block.nNonce   = 0;
 
         if (fTestNet)
         {
             block.nTime    = 1393667056;
-            block.nNonce   = 2126260;
+            block.nNonce   = 0;
        }
 
         //// debug print
@@ -2927,8 +2926,9 @@ CBlock(hash=00000e5e37c42d6b67d0934399adfb0fa48b59138abb1a8842c88f4ca3d4ec96, ve
         printf("%s\n", hashGenesisBlock.ToString().c_str());
         printf("%s\n", block.hashMerkleRoot.ToString().c_str());
         block.print();
-//need genesis block
-        assert(block.hashMerkleRoot == uint256("6f3ce9ca817223ebaed26ac93927e6f888b5cc03967a38e6bcc04ea0f5d20b08"));
+
+//assert search
+        assert(block.hashMerkleRoot == uint256(""));
         assert(hash == hashGenesisBlock);
 
 
