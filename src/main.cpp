@@ -37,7 +37,7 @@ CTxMemPool mempool;
 unsigned int nTransactionsUpdated = 0;
 
 map<uint256, CBlockIndex*> mapBlockIndex;
-uint256 hashGenesisBlock("0x0000056a463528129a2398366dfd4b56a80298c2e84f4c099bc518590f2195bb");
+uint256 hashGenesisBlock("0x000004ded2d17377957f4438e192f895dfba4891dca963b2ff7f49d00cb2f297");
 static const unsigned int timeGenesisBlock = 1393665298;
 static CBigNum bnProofOfWorkLimit(~uint256(0) >> 20);
 CBlockIndex* pindexGenesisBlock = NULL;
@@ -2844,7 +2844,7 @@ bool LoadBlockIndex()
         pchMessageStart[1] = 0x1A;
         pchMessageStart[2] = 0x39;
         pchMessageStart[3] = 0xF7;
-        hashGenesisBlock = uint256("0x000007f44f0953f5801211031f39f0569f06f71119a20eff10acf4abb556ea0d");
+        hashGenesisBlock = uint256("0x00000ff270a90204ec3d401de2bacdaf916516c0bd87d2ae27d3dfdf25e2d4ce");
     }
 
     //
@@ -2892,7 +2892,7 @@ CBlock(hash=00000e5e37c42d6b67d0934399adfb0fa48b59138abb1a8842c88f4ca3d4ec96, ve
 */
 
         // Genesis block
-        const char* pszTimestamp = "Such Quark with Such Coin Equal Such EQ 150";
+        const char* pszTimestamp = "China Crisis Gauge Hits Record as Investors Draw Parallel to 2008";
         CTransaction txNew;
         txNew.vin.resize(1);
         txNew.vout.resize(1);
@@ -2921,13 +2921,12 @@ CBlock(hash=00000e5e37c42d6b67d0934399adfb0fa48b59138abb1a8842c88f4ca3d4ec96, ve
             hash = block.GetHash();
         }
         
-        printf("%s\n", block.GetHash().ToString().c_str());
         printf("%s\n", hash.ToString().c_str());
         printf("%s\n", hashGenesisBlock.ToString().c_str());
         printf("%s\n", block.hashMerkleRoot.ToString().c_str());
         block.print();
 //need genesis block
-        assert(block.hashMerkleRoot == uint256("0x0000056a463528129a2398366dfd4b56a80298c2e84f4c099bc518590f2195bb"));
+        assert(block.hashMerkleRoot == uint256("0x6f3ce9ca817223ebaed26ac93927e6f888b5cc03967a38e6bcc04ea0f5d20b08"));
         assert(hash == hashGenesisBlock);
 
 
