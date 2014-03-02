@@ -37,7 +37,7 @@ CTxMemPool mempool;
 unsigned int nTransactionsUpdated = 0;
 
 map<uint256, CBlockIndex*> mapBlockIndex;
-uint256 hashGenesisBlock("0x000004ded2d17377957f4438e192f895dfba4891dca963b2ff7f49d00cb2f297");
+uint256 hashGenesisBlock("0x00000c92ee44bdddf302e9c992fa91a82acde70fb610345e5dfd305111f108ea");
 static const unsigned int timeGenesisBlock = 1393665298;
 static CBigNum bnProofOfWorkLimit(~uint256(0) >> 20);
 CBlockIndex* pindexGenesisBlock = NULL;
@@ -1407,7 +1407,8 @@ void CBlockHeader::UpdateTime(const CBlockIndex* pindexPrev)
 const CTxOut &CTransaction::GetOutputFor(const CTxIn& input, CCoinsViewCache& view)
 {
     const CCoins &coins = view.GetCoins(input.prevout.hash);
-    assert(coins.IsAvailable(input.prevout.n));
+    
+assert(coins.IsAvailable(input.prevout.n));
     return coins.vout[input.prevout.n];
 }
 
@@ -1857,7 +1858,8 @@ bool SetBestChain(CValidationState &state, CBlockIndex* pindexNew)
     {
         while (plonger->nHeight > pfork->nHeight) {
             plonger = plonger->pprev;
-            assert(plonger != NULL);
+            
+assert(plonger != NULL);
         }
         if (pfork == plonger)
             break;
@@ -2844,7 +2846,7 @@ bool LoadBlockIndex()
         pchMessageStart[1] = 0x1A;
         pchMessageStart[2] = 0x39;
         pchMessageStart[3] = 0xF7;
-        hashGenesisBlock = uint256("0x00000ff270a90204ec3d401de2bacdaf916516c0bd87d2ae27d3dfdf25e2d4ce");
+        hashGenesisBlock = uint256("0x00000ebb40d7303580442fae35ae138a5ffe70fbafce85eaebc63fffcb8820f1");
     }
 
     //
@@ -2906,12 +2908,12 @@ CBlock(hash=00000e5e37c42d6b67d0934399adfb0fa48b59138abb1a8842c88f4ca3d4ec96, ve
         block.nVersion = 112;
         block.nTime    = timeGenesisBlock;
         block.nBits    = bnProofOfWorkLimit.GetCompact();
-        block.nNonce   = 906430990;
+        block.nNonce   = 2126260;
 
         if (fTestNet)
         {
             block.nTime    = 1393667056;
-            block.nNonce   = 906430990;
+            block.nNonce   = 2126260;
        }
 
         //// debug print
@@ -2926,7 +2928,7 @@ CBlock(hash=00000e5e37c42d6b67d0934399adfb0fa48b59138abb1a8842c88f4ca3d4ec96, ve
         printf("%s\n", block.hashMerkleRoot.ToString().c_str());
         block.print();
 //need genesis block
-        assert(block.hashMerkleRoot == uint256("0x6f3ce9ca817223ebaed26ac93927e6f888b5cc03967a38e6bcc04ea0f5d20b08"));
+        assert(block.hashMerkleRoot == uint256("6f3ce9ca817223ebaed26ac93927e6f888b5cc03967a38e6bcc04ea0f5d20b08"));
         assert(hash == hashGenesisBlock);
 
 
