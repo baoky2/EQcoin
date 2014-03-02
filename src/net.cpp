@@ -1,6 +1,7 @@
 // Copyright (c) 2009-2010 Satoshi Nakamoto
 // Copyright (c) 2009-2012 The Bitcoin developers
 // Copyright (c) 2013 Quarkcoin developers
+// Copyright (c) 2013-2014 The FairQuark Developers
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -1192,7 +1193,8 @@ void MapPort(bool)
 // The first name is used as information source for addrman.
 // The second name should resolve to a list of seed addresses.
 static const char *strMainNetDNSSeed[][2] = {
-    {"198.204.236.50", "198.204.236.50"},
+    {"node1.fairquark.com", "node1.fairquark.com"},
+    {"node2.fairquark.com", "node2.fairquark.com"},
     {NULL, NULL}
 };
 

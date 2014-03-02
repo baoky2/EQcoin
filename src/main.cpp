@@ -37,7 +37,7 @@ CTxMemPool mempool;
 unsigned int nTransactionsUpdated = 0;
 
 map<uint256, CBlockIndex*> mapBlockIndex;
-uint256 hashGenesisBlock("");
+uint256 hashGenesisBlock("0x0000034c000c759ee9cca17668f270ea51eb692e771077f77c7a01c6e5bb5c29");
 static const unsigned int timeGenesisBlock = 1393665298;
 static CBigNum bnProofOfWorkLimit(~uint256(0) >> 20);
 CBlockIndex* pindexGenesisBlock = NULL;
@@ -2845,7 +2845,7 @@ bool LoadBlockIndex()
         pchMessageStart[1] = 0x1A;
         pchMessageStart[2] = 0x39;
         pchMessageStart[3] = 0xF7;
-        hashGenesisBlock = uint256("");
+        hashGenesisBlock = uint256("0x000008ef78fe1f8035d826c9a6cc0a5144495c277148d7500377632f78b2a4b8");
     }
 
     //
@@ -2893,7 +2893,7 @@ CBlock(hash=00000e5e37c42d6b67d0934399adfb0fa48b59138abb1a8842c88f4ca3d4ec96, ve
 */
 
         // Genesis block
-        const char* pszTimestamp = "Apple Better Watch Out. Samsung Wastes Little Time in Wheeling Out More Smartwatches";
+        const char* pszTimestamp = "Apple Better Watch Out Samsung Wastes Little Time in Wheeling Out More Smartwatches";
         CTransaction txNew;
         txNew.vin.resize(1);
         txNew.vout.resize(1);
@@ -2907,12 +2907,12 @@ CBlock(hash=00000e5e37c42d6b67d0934399adfb0fa48b59138abb1a8842c88f4ca3d4ec96, ve
         block.nVersion = 112;
         block.nTime    = timeGenesisBlock;
         block.nBits    = bnProofOfWorkLimit.GetCompact();
-        block.nNonce   = 0;
+        block.nNonce   = 2153247;
 
         if (fTestNet)
         {
             block.nTime    = 1393667056;
-            block.nNonce   = 0;
+            block.nNonce   = 349298;
        }
 
         //// debug print
@@ -2928,7 +2928,7 @@ CBlock(hash=00000e5e37c42d6b67d0934399adfb0fa48b59138abb1a8842c88f4ca3d4ec96, ve
         block.print();
 
 //assert search
-        assert(block.hashMerkleRoot == uint256(""));
+        assert(block.hashMerkleRoot == uint256("0x0cb0ef2ef800c7d458cb9fdff4a6e70c3c79206402f7fb82d2ed01de9013e1bc"));
         assert(hash == hashGenesisBlock);
 
 
