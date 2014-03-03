@@ -37,8 +37,8 @@ CTxMemPool mempool;
 unsigned int nTransactionsUpdated = 0;
 
 map<uint256, CBlockIndex*> mapBlockIndex;
-uint256 hashGenesisBlock("0x0000034c000c759ee9cca17668f270ea51eb692e771077f77c7a01c6e5bb5c29");
-static const unsigned int timeGenesisBlock = 1393665298;
+uint256 hashGenesisBlock("0x00000d1e7af4d1957bcde38edb76d9bada50e2b738f1589e3fecf1f800b3b681");
+static const unsigned int timeGenesisBlock = 1393815704;
 static CBigNum bnProofOfWorkLimit(~uint256(0) >> 20);
 CBlockIndex* pindexGenesisBlock = NULL;
 int nBestHeight = -1;
@@ -2893,7 +2893,7 @@ CBlock(hash=00000e5e37c42d6b67d0934399adfb0fa48b59138abb1a8842c88f4ca3d4ec96, ve
 */
 
         // Genesis block
-        const char* pszTimestamp = "Apple Better Watch Out Samsung Wastes Little Time in Wheeling Out More Smartwatches";
+        const char* pszTimestamp = "Asia Stocks Fall Amid Ukraine Tension China Economy Data";
         CTransaction txNew;
         txNew.vin.resize(1);
         txNew.vout.resize(1);
@@ -2907,12 +2907,12 @@ CBlock(hash=00000e5e37c42d6b67d0934399adfb0fa48b59138abb1a8842c88f4ca3d4ec96, ve
         block.nVersion = 112;
         block.nTime    = timeGenesisBlock;
         block.nBits    = bnProofOfWorkLimit.GetCompact();
-        block.nNonce   = 2153247;
+        block.nNonce   = 1836869;
 
         if (fTestNet)
         {
             block.nTime    = 1393667056;
-            block.nNonce   = 2153247;
+            block.nNonce   = 1836869;
        }
 
         //// debug print
@@ -2928,7 +2928,7 @@ CBlock(hash=00000e5e37c42d6b67d0934399adfb0fa48b59138abb1a8842c88f4ca3d4ec96, ve
         block.print();
 
 //assert search
-        assert(block.hashMerkleRoot == uint256("0x0cb0ef2ef800c7d458cb9fdff4a6e70c3c79206402f7fb82d2ed01de9013e1bc"));
+        assert(block.hashMerkleRoot == uint256("0x69fe05d347a8af2bc6fa3019a228af04435556635dd2a4f2292d78bc80e108e2"));
         assert(hash == hashGenesisBlock);
 
 
